@@ -19,13 +19,13 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get("/films", async (req, res) => {
+app.get("/planets", async (req, res) => {
   try {
     const client = await MongoClient.connect(url);
     const db = client.db(dbName);
-    const collection = db.collection(filmsCollection);
-    const films = await collection.find({}).toArray();
-    res.json(films);
+    const collection = db.collection(planetsCollection);
+    const planets = await collection.find({}).toArray();
+    res.json(planets);
   } catch (err) {
     console.error("Error:", err);
     res.status(500).send("Hmmm, something smells...");
