@@ -130,6 +130,85 @@ app.get("/films/:id/characters", async (req, res) => {
   }
 });
 
+app.get("/films/:id/planets", async (req, res) => {
+  try {
+    const film_id = parseInt(req.params.id);
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection(filmsPlanetsCollection);
+    const film_planet_keys = await collection
+      .find({ film_id: film_id })
+      .toArray();
+    const planets = await Promise.all(
+      film_planet_keys.map(async (id) => {
+        return await getElementById(id.planet_id, planetsCollection);
+      })
+    );
+    res.json(planets);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/characters/:id/films", async (req, res) => {
+  try {
+    const character_id = parseInt(req.params.id);
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection(filmsCharactersCollection);
+    const character_film_keys = await collection
+      .find({ character_id: character_id })
+      .toArray();
+    const films = await Promise.all(
+      character_film_keys.map(async (id) => {
+        return await getElementById(id.film_id, filmsCollection);
+      })
+    );
+    res.json(films);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/planets/:id/films", async (req, res) => {
+  try {
+    const planet_id = parseInt(req.params.id);
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection(filmsPlanetsCollection);
+    const planet_film_keys = await collection
+      .find({ planet_id: planet_id })
+      .toArray();
+    const films = await Promise.all(
+      planet_film_keys.map(async (id) => {
+        return await getElementById(id.film_id, filmsCollection);
+      })
+    );
+    res.json(films);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/planets/:id/characters", async (req, res) => {
+  try {
+    const planet_id = parseInt(req.params.id);
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection(charactersCollection);
+    const characters = await collection
+      .find({ homeworld: planet_id })
+      .toArray();
+    res.json(characters);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running.`);
 });
